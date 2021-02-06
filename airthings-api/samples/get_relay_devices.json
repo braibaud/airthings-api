@@ -1,0 +1,26 @@
+{
+    "hubs": [
+        {
+            "serialNumber": "2222222222",
+            "deviceType": "hub",
+            "locationId": "00000000-0000-0000-0000-000000000000",
+            "name": "Hub Air Things",
+            "metaData": {
+                "lastSeen": "2021-01-01T12:12:12",
+                "bleFirmwareVersion": "1.0.0",
+                "subFirmwareVersion": "2.0.0",
+                "stFirmwareVersion": "2.0.0",
+                "lastSeenDevices": [
+                    "2222222222",
+                    "3333333333"
+                ],
+                "devices": {
+                    "2222222222": 4444444444,
+                    "3333333333": 5555555555
+                },
+                "region": "ETSI",
+                "cell": false
+            }
+        }
+    ]
+}

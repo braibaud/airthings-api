@@ -1,0 +1,155 @@
+{
+    "locations": [
+        {
+            "id": "00000000-0000-0000-0000-000000000000",
+            "name": "Home",
+            "lat": 45.00000,
+            "lng": 5.00000,
+            "devices": [
+                {
+                    "serialNumber": "2222222222",
+                    "locationName": "Home",
+                    "locationId": "00000000-0000-0000-0000-000000000000",
+                    "roomName": "Wave Mini",
+                    "publiclyAvailable": false,
+                    "segmentId": "00000000-0000-0000-0000-000000000000",
+                    "segmentStart": "2021-01-01T12:12:12",
+                    "latestSample": "2021-01-01T12:12:12",
+                    "currentSensorValues": [
+                        {
+                            "type": "temp",
+                            "value": 21.5,
+                            "providedUnit": "c",
+                            "preferredUnit": "c",
+                            "isAlert": false,
+                            "thresholds": [
+                                18,
+                                25
+                            ]
+                        },
+                        {
+                            "type": "humidity",
+                            "value": 41.0,
+                            "providedUnit": "pct",
+                            "preferredUnit": "pct",
+                            "isAlert": false,
+                            "thresholds": [
+                                25,
+                                30,
+                                60,
+                                70
+                            ]
+                        },
+                        {
+                            "type": "voc",
+                            "value": 54.0,
+                            "providedUnit": "ppb",
+                            "preferredUnit": "ppb",
+                            "isAlert": false,
+                            "thresholds": [
+                                250,
+                                2000
+                            ]
+                        },
+                        {
+                            "type": "mold",
+                            "value": 0.0,
+                            "providedUnit": "riskIndex",
+                            "preferredUnit": "riskIndex",
+                            "isAlert": false,
+                            "thresholds": [
+                                3,
+                                7
+                            ]
+                        }
+                    ],
+                    "batteryPercentage": 100,
+                    "rssi": -53,
+                    "relayDevice": "HUB",
+                    "isHubConnectionLost": false,
+                    "type": "waveMini"
+                },
+                {
+                    "serialNumber": "3333333333",
+                    "locationName": "Home",
+                    "locationId": "00000000-0000-0000-0000-000000000000",
+                    "roomName": "Wave",
+                    "publiclyAvailable": false,
+                    "segmentId": "00000000-0000-0000-0000-000000000000",
+                    "segmentStart": "2021-01-01T12:12:12",
+                    "latestSample": "2021-01-01T12:12:12",
+                    "currentSensorValues": [
+                        {
+                            "type": "radonShortTermAvg",
+                            "value": 94.0,
+                            "providedUnit": "bq",
+                            "preferredUnit": "bq",
+                            "isAlert": false,
+                            "thresholds": [
+                                100,
+                                150
+                            ]
+                        },
+                        {
+                            "type": "temp",
+                            "value": 20.3,
+                            "providedUnit": "c",
+                            "preferredUnit": "c",
+                            "isAlert": false,
+                            "thresholds": [
+                                18,
+                                25
+                            ]
+                        },
+                        {
+                            "type": "humidity",
+                            "value": 47.0,
+                            "providedUnit": "pct",
+                            "preferredUnit": "pct",
+                            "isAlert": false,
+                            "thresholds": [
+                                25,
+                                30,
+                                60,
+                                70
+                            ]
+                        }
+                    ],
+                    "batteryPercentage": 100,
+                    "rssi": -46,
+                    "relayDevice": "HUB",
+                    "isHubConnectionLost": false,
+                    "type": "wave2"
+                }
+            ],
+            "lowBatteryCount": 0,
+            "deviceCount": 2,
+            "floorplans": [],
+            "usageHours": {}
+        },
+        {
+            "id": "00000000-0000-0000-0000-000000000000",
+            "name": "-",
+            "address": "-",
+            "lat": 45.00000,
+            "lng": 5.00000,
+            "devices": [
+                {
+                    "serialNumber": "6666666666",
+                    "locationName": "-",
+                    "locationId": "00000000-0000-0000-0000-000000000000",
+                    "roomName": "Hub Air Things",
+                    "publiclyAvailable": false,
+                    "segmentId": "00000000-0000-0000-0000-000000000000",
+                    "segmentStart": "2021-01-01T12:12:12",
+                    "currentSensorValues": [],
+                    "type": "hub"
+                }
+            ],
+            "lowBatteryCount": 0,
+            "deviceCount": 1,
+            "floorplans": [],
+            "usageHours": {}
+        }
+    ]
+}

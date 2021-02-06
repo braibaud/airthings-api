@@ -1,0 +1,171 @@
+{
+    "name": "John Doe",
+    "email": "jdoe@gmail.com",
+    "dateFormat": "EUR",
+    "measurementUnit": "METRIC",
+    "isProUser": false,
+    "notifications": {
+        "thresholds": {
+            "radonShortTermAvg": {
+                "defaultHigh": 100,
+                "defaultLow": 50,
+                "minSelectableValue": 0,
+                "maxSelectableValue": 2000,
+                "unit": "bq",
+                "thresholdDelta": 5.0
+            },
+            "radonLongTermAvg": {
+                "defaultHigh": 100,
+                "defaultLow": 50,
+                "minSelectableValue": 0,
+                "maxSelectableValue": 2000,
+                "unit": "bq",
+                "thresholdDelta": 5.0
+            },
+            "temp": {
+                "defaultHigh": 22,
+                "defaultLow": 19,
+                "minSelectableValue": -10,
+                "maxSelectableValue": 60,
+                "unit": "c",
+                "thresholdDelta": 1.0
+            },
+            "humidity": {
+                "defaultHigh": 60,
+                "defaultLow": 30,
+                "minSelectableValue": 0,
+                "maxSelectableValue": 100,
+                "unit": "pct",
+                "thresholdDelta": 1.0
+            },
+            "co2": {
+                "defaultHigh": 800,
+                "defaultLow": 500,
+                "minSelectableValue": 350,
+                "maxSelectableValue": 3000,
+                "unit": "ppm",
+                "thresholdDelta": 25.0
+            },
+            "voc": {
+                "defaultHigh": 2000,
+                "defaultLow": 1500,
+                "minSelectableValue": 0,
+                "maxSelectableValue": 2000,
+                "unit": "ppb",
+                "thresholdDelta": 100.0
+            },
+            "pressure": {
+                "defaultHigh": 1000,
+                "defaultLow": 1000,
+                "minSelectableValue": 900,
+                "maxSelectableValue": 1100,
+                "unit": "mbar",
+                "thresholdDelta": 2.0
+            },
+            "light": {
+                "defaultHigh": 100,
+                "defaultLow": 0,
+                "minSelectableValue": 0,
+                "maxSelectableValue": 100,
+                "unit": "pct",
+                "thresholdDelta": 20.0
+            },
+            "batteryPercentage": {
+                "defaultHigh": 1000,
+                "defaultLow": 11,
+                "minSelectableValue": 0,
+                "maxSelectableValue": 100,
+                "unit": "pct",
+                "thresholdDelta": 1.5
+            },
+            "orientation": {
+                "defaultHigh": 180,
+                "defaultLow": 0,
+                "minSelectableValue": 0,
+                "maxSelectableValue": 180,
+                "unit": "deg",
+                "thresholdDelta": 180.0
+            },
+            "pm1": {
+                "defaultHigh": 35,
+                "defaultLow": 10,
+                "minSelectableValue": 0,
+                "maxSelectableValue": 40,
+                "unit": "pcpp1l",
+                "thresholdDelta": 10.0
+            },
+            "pm25": {
+                "defaultHigh": 35,
+                "defaultLow": 10,
+                "minSelectableValue": 0,
+                "maxSelectableValue": 40,
+                "unit": "pcpp1l",
+                "thresholdDelta": 10.0
+            },
+            "mold": {
+                "defaultHigh": 7,
+                "defaultLow": 3,
+                "minSelectableValue": 0,
+                "maxSelectableValue": 10,
+                "unit": "riskIndex",
+                "thresholdDelta": 0.5
+            },
+            "staleAir": {
+                "defaultHigh": 6,
+                "defaultLow": 3,
+                "minSelectableValue": 0,
+                "maxSelectableValue": 10,
+                "unit": "riskIndex",
+                "thresholdDelta": 0.5
+            },
+            "transmissionEfficiency": {
+                "defaultHigh": 6,
+                "defaultLow": 3,
+                "minSelectableValue": 0,
+                "maxSelectableValue": 10,
+                "unit": "riskIndex",
+                "thresholdDelta": 0.5
+            },
+            "virusSurvivalRate": {
+                "defaultHigh": 6,
+                "defaultLow": 3,
+                "minSelectableValue": 0,
+                "maxSelectableValue": 10,
+                "unit": "riskIndex",
+                "thresholdDelta": 0.5
+            },
+            "virusRisk": {
+                "defaultHigh": 7,
+                "defaultLow": 4,
+                "minSelectableValue": 0,
+                "maxSelectableValue": 10,
+                "unit": "riskIndex",
+                "thresholdDelta": 0.5
+            },
+            "hourlyRadon": {
+                "defaultHigh": 100,
+                "defaultLow": 50,
+                "minSelectableValue": 0,
+                "maxSelectableValue": 2000,
+                "unit": "bq",
+                "thresholdDelta": 5.0
+            }
+        }
+    },
+    "rfRegion": "EUROPE",
+    "isDemoUser": false,
+    "groups": [{
+        "id": "00000000-0000-0000-0000-000000000000",
+        "groupName": "Consumer genesis group",
+        "genesis": true,
+        "role": "ADMIN",
+        "createdByUserId": "00000000-0000-0000-0000-000000000000",
+        "createdAt": "2021-01-01T12:12:12",
+        "updatedAt": "2021-01-01T12:12:12",
+        "displaySubscription": false
+    }],
+    "language": "fr",
+    "intercomUserHash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "userId": "00000000-0000-0000-0000-000000000000"
+}
+

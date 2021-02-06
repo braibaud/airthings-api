@@ -1,0 +1,124 @@
+{
+    "thresholds": {
+        "temp": {
+            "type": "temp",
+            "unit": "c",
+            "ranges": [{
+                "to": 18,
+                "rating": "POOR"
+            }, {
+                "from": 18,
+                "to": 25,
+                "rating": "GOOD"
+            }, {
+                "from": 25,
+                "rating": "POOR"
+            }]
+        },
+        "humidity": {
+            "type": "humidity",
+            "unit": "pct",
+            "ranges": [{
+                "to": 25,
+                "rating": "POOR"
+            }, {
+                "from": 25,
+                "to": 30,
+                "rating": "FAIR"
+            }, {
+                "from": 30,
+                "to": 60,
+                "rating": "GOOD"
+            }, {
+                "from": 60,
+                "to": 70,
+                "rating": "FAIR"
+            }, {
+                "from": 70,
+                "rating": "POOR"
+            }]
+        },
+        "voc": {
+            "type": "voc",
+            "unit": "ppb",
+            "ranges": [{
+                "to": 250,
+                "rating": "GOOD"
+            }, {
+                "from": 250,
+                "to": 2000,
+                "rating": "FAIR"
+            }, {
+                "from": 2000,
+                "rating": "POOR"
+            }]
+        },
+        "co2": {
+            "type": "co2",
+            "unit": "ppm",
+            "ranges": [{
+                "to": 800,
+                "rating": "GOOD"
+            }, {
+                "from": 800,
+                "to": 1000,
+                "rating": "FAIR"
+            }, {
+                "from": 1000,
+                "rating": "POOR"
+            }]
+        },
+        "radonShortTermAvg": {
+            "type": "radonShortTermAvg",
+            "unit": "bq",
+            "ranges": [{
+                "to": 100,
+                "rating": "GOOD"
+            }, {
+                "from": 100,
+                "to": 150,
+                "rating": "FAIR"
+            }, {
+                "from": 150,
+                "rating": "POOR"
+            }]
+        },
+        "pressure": {
+            "type": "pressure",
+            "unit": "mbar",
+            "ranges": [{
+                "rating": "GOOD"
+            }]
+        },
+        "mold": {
+            "type": "mold",
+            "unit": "riskIndex",
+            "ranges": [{
+                "to": 3,
+                "rating": "GOOD"
+            }, {
+                "from": 3,
+                "to": 7,
+                "rating": "FAIR"
+            }, {
+                "from": 7,
+                "rating": "POOR"
+            }]
+        },
+        "virusRisk": {
+            "type": "virusRisk",
+            "unit": "riskIndex",
+            "ranges": [{
+                "to": 4,
+                "rating": "GOOD"
+            }, {
+                "from": 4,
+                "to": 7,
+                "rating": "FAIR"
+            }, {
+                "from": 7,
+                "rating": "POOR"
+            }]
+        }
+    }
+}
