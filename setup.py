@@ -8,7 +8,7 @@ AirThings-API is compatible with Python 3.7 and is distributed under the MIT lic
 
 setup(
     name='AirThings-API',
-    version='0.1.0',
+    version='0.1.1',
     description='Python Wrappers for AirThings API',
     long_description=long_description,
     author='Benjamin Raibaud',
