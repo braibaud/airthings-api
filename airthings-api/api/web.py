@@ -436,7 +436,7 @@ class AirThingsManager:
         return str(template).format(*args)
 
     @staticmethod
-    async def __poll_generic_entity(session, access_token, entity) -> Optional[Dict[str, Any]]:
+    async def __poll_generic_entity(session: aiohttp.ClientSession, access_token: str, entity: str) -> Optional[Dict[str, Any]]:
         async with AirThingsManager.get_session(session) as ses:
             async with ses.get(
                     url=AirThingsManager.format_string(
@@ -468,40 +468,52 @@ class AirThingsManager:
 
 
     @staticmethod
-    async def __poll_relay_devices_base(access_token) -> Optional[Dict[str, Any]]:
+    async def __poll_relay_devices_base(session: aiohttp.ClientSession, access_token: str) -> Optional[Dict[str, Any]]:
         return await AirThingsManager.__poll_generic_entity(
+            session=session,
             access_token=access_token,
             entity='relay-devices')
 
     async def __poll_relay_devices(self) -> Optional[Dict[str, Any]]:
-        return await AirThingsManager.__poll_relay_devices_base(self.tokens['access_token'])
+        return await AirThingsManager.__poll_relay_devices_base(
+            session=self.get_session(),
+            access_token=self.tokens['access_token'])
 
 
     @staticmethod
-    async def __poll_locations_base(access_token) -> Optional[Dict[str, Any]]:
+    async def __poll_locations_base(session: aiohttp.ClientSession, access_token: str) -> Optional[Dict[str, Any]]:
         return await AirThingsManager.__poll_generic_entity(
+            session=session,
             access_token=access_token,
             entity='location')
 
     async def __poll_locations(self) -> Optional[Dict[str, Any]]:
-        return await AirThingsManager.__poll_locations_base(self.tokens['access_token'])
+        return await AirThingsManager.__poll_locations_base(
+            session=self.get_session(),
+            access_token=self.tokens['access_token'])
 
 
     @staticmethod
-    async def __poll_thresholds_base(access_token) -> Optional[Dict[str, Any]]:
+    async def __poll_thresholds_base(session: aiohttp.ClientSession, access_token: str) -> Optional[Dict[str, Any]]:
         return await AirThingsManager.__poll_generic_entity(
+            session=session,
             access_token=access_token,
             entity='thresholds')
 
     async def __poll_thresholds(self) -> Optional[Dict[str, Any]]:
-        return await AirThingsManager.__poll_thresholds_base(self.tokens['access_token'])
+        return await AirThingsManager.__poll_thresholds_base(
+            session=self.get_session(),
+            access_token=self.tokens['access_token'])
 
 
     @staticmethod
-    async def __poll_me_base(access_token) -> Optional[Dict[str, Any]]:
+    async def __poll_me_base(session: aiohttp.ClientSession, access_token: str) -> Optional[Dict[str, Any]]:
         return await AirThingsManager.__poll_generic_entity(
+            session=session,
             access_token=access_token,
             entity='me/')
 
     async def __poll_me(self) -> Optional[Dict[str, Any]]:
-        return await AirThingsManager.__poll_me_base(self.tokens['access_token'])
+        return await AirThingsManager.__poll_me_base(
+            session=self.get_session(),
+            access_token=self.tokens['access_token'])

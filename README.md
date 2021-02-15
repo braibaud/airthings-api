@@ -17,7 +17,10 @@ ata = __import__('airthings-api')
 # Create an API manager; use your dashboard's credentials
 manager = ata.api.web.AirThingsManager(
     username='jdoe@gmail.com', 
-    password='xxxxxxxx')
+    password='xxxxxxxx',
+    session=...) 
+# Set session param to None, or pass a valid aiohttp.ClientSession object instance. 
+# Passing None will create one on demand.
 
 # Get the 'me' instance
 me = await manager.get_me_instance()
