@@ -1,16 +1,15 @@
 from setuptools import setup
 from setuptools import find_packages
 
-long_description = '''
-AirThings-API is a high-level API wrapper for AirThings sensors.
-AirThings-API is compatible with Python 3.7 and is distributed under the MIT license.
-'''
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
 
 setup(
     name='AirThings-API',
     version='0.1.1',
     description='Python Wrappers for AirThings API',
     long_description=long_description,
+    long_description_content_type="text/markdown",
     author='Benjamin Raibaud',
     author_email='braibaud@gmail.com',
     url='https://github.com/braibaud/airthings-api',
