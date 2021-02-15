@@ -59,9 +59,10 @@ class AirThingsUnauthorizedException(AirThingsException):
 
 class AirThingsManager:
 
-    def __init__(self, username: str, password: str) -> None:
+    def __init__(self, username: str, password: str, session: aiohttp.ClientSession) -> None:
         self.username = username
         self.password = password
+        self.session = session
         self.tokens: Optional[Dict[str, Any]] = None
 
     async def get_relay_devices_instance(self) -> rdi.RelayDevicesInstance:
@@ -84,7 +85,10 @@ class AirThingsManager:
             await self.__execute_poll(
                 poll_coroutine=self.__poll_me()))
 
-
+    async def validate_credentials(self) -> bool:
+        advise = await self.__assert_ready()
+        return (advise == AirThingsAuthenticationAdvise.ShouldBeGood)
+        
     async def __execute_poll(self, poll_coroutine: Coroutine) -> Optional[Dict[str, Any]]:
         advise = await self.__assert_ready()
         
@@ -157,17 +161,21 @@ class AirThingsManager:
     async def __perform_login(self) -> AirThingsAuthenticationAdvise:
         try:
             token = await AirThingsManager.__get_token(
+                session=self.get_session(),
                 username=self.username,
                 password=self.password)
 
             consent = await AirThingsManager.__get_consent(
+                session=self.get_session(),
                 token=token)
 
             authorization_code = await AirThingsManager.__get_authorization_code(
+                session=self.get_session(),
                 token=token,
                 consent=consent)
 
             self.tokens = await AirThingsManager.__get_access_and_refresh_token(
+                session=self.get_session(),
                 authorization_code=authorization_code)
 
             return AirThingsAuthenticationAdvise.ShouldBeGood
@@ -195,6 +203,7 @@ class AirThingsManager:
     async def __perform_refresh(self) -> AirThingsAuthenticationAdvise:
         try:
             self.tokens = await AirThingsManager.__refresh_access_and_refresh_token(
+                session=self.get_session(),
                 previous_refresh_token=self.tokens['refresh_token'])
 
             return AirThingsAuthenticationAdvise.ShouldBeGood
@@ -221,9 +230,9 @@ class AirThingsManager:
 
 
     @staticmethod
-    async def __get_token(username: str, password: str) -> str:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
+    async def __get_token(session: aiohttp.ClientSession, username: str, password: str) -> str:
+        async with AirThingsManager.get_session(session) as ses:
+            async with ses.post(
                     url=AirThingsManager.format_string(
                         AirThingsConstant.CT_ACCOUNTS_API_BASE,
                         'token'),
@@ -255,9 +264,9 @@ class AirThingsManager:
                         error_details=await response.text())
 
     @staticmethod
-    async def __get_consent(token) -> Optional[Dict[str, Any]]:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
+    async def __get_consent(session: aiohttp.ClientSession, token: str) -> Optional[Dict[str, Any]]:
+        async with AirThingsManager.get_session(session) as ses:
+            async with ses.get(
                     url=AirThingsManager.format_string(
                         AirThingsConstant.CT_ACCOUNTS_API_BASE,
                         'consents/dashboard?client_id=dashboard&redirect_uri={0}'.format(
@@ -286,9 +295,9 @@ class AirThingsManager:
                         error_details=await response.text())
 
     @staticmethod
-    async def __get_authorization_code(token, consent) -> str:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
+    async def __get_authorization_code(session: aiohttp.ClientSession, token: str, consent) -> str:
+        async with AirThingsManager.get_session(session) as ses:
+            async with ses.post(
                     url=AirThingsManager.format_string(
                         AirThingsConstant.CT_ACCOUNTS_API_BASE,
                         'authorize?client_id=dashboard&redirect_uri={0}'.format(
@@ -324,9 +333,9 @@ class AirThingsManager:
                         error_details=await response.text())
 
     @staticmethod
-    async def __get_access_and_refresh_token(authorization_code) -> Optional[Dict[str, Any]]:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
+    async def __get_access_and_refresh_token(session: aiohttp.ClientSession, authorization_code: str) -> Optional[Dict[str, Any]]:
+        async with AirThingsManager.get_session(session) as ses:
+            async with ses.post(
                     url=AirThingsManager.format_string(
                         AirThingsConstant.CT_ACCOUNTS_API_BASE,
                         'token'),
@@ -368,9 +377,9 @@ class AirThingsManager:
                         error_details=await response.text())
 
     @staticmethod
-    async def __refresh_access_and_refresh_token(previous_refresh_token) -> Optional[Dict[str, Any]]:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
+    async def __refresh_access_and_refresh_token(session: aiohttp.ClientSession, previous_refresh_token: str) -> Optional[Dict[str, Any]]:
+        async with AirThingsManager.get_session(session) as ses:
+            async with ses.post(
                     url=AirThingsManager.format_string(
                         AirThingsConstant.CT_ACCOUNTS_API_BASE,
                         'token'),
@@ -410,6 +419,11 @@ class AirThingsManager:
                         error_code=response.status,
                         error_details=await response.text())
 
+    def get_session(self):
+        if self.session is None:
+            self.session = aiohttp.ClientSession()
+        return self.session
+
     @staticmethod
     def log(**kwargs):
         logger = ''
@@ -422,9 +436,9 @@ class AirThingsManager:
         return str(template).format(*args)
 
     @staticmethod
-    async def __poll_generic_entity(access_token, entity) -> Optional[Dict[str, Any]]:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
+    async def __poll_generic_entity(session, access_token, entity) -> Optional[Dict[str, Any]]:
+        async with AirThingsManager.get_session(session) as ses:
+            async with ses.get(
                     url=AirThingsManager.format_string(
                         AirThingsConstant.CT_WEB_API_BASE,
                         entity),
