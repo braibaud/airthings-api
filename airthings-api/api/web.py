@@ -161,21 +161,21 @@ class AirThingsManager:
     async def __perform_login(self) -> AirThingsAuthenticationAdvise:
         try:
             token = await AirThingsManager.__get_token(
-                session=self.get_session(),
+                session=self.session,
                 username=self.username,
                 password=self.password)
 
             consent = await AirThingsManager.__get_consent(
-                session=self.get_session(),
+                session=self.session,
                 token=token)
 
             authorization_code = await AirThingsManager.__get_authorization_code(
-                session=self.get_session(),
+                session=self.session,
                 token=token,
                 consent=consent)
 
             self.tokens = await AirThingsManager.__get_access_and_refresh_token(
-                session=self.get_session(),
+                session=self.session,
                 authorization_code=authorization_code)
 
             return AirThingsAuthenticationAdvise.ShouldBeGood
@@ -203,7 +203,7 @@ class AirThingsManager:
     async def __perform_refresh(self) -> AirThingsAuthenticationAdvise:
         try:
             self.tokens = await AirThingsManager.__refresh_access_and_refresh_token(
-                session=self.get_session(),
+                session=self.session,
                 previous_refresh_token=self.tokens['refresh_token'])
 
             return AirThingsAuthenticationAdvise.ShouldBeGood
@@ -231,198 +231,188 @@ class AirThingsManager:
 
     @staticmethod
     async def __get_token(session: aiohttp.ClientSession, username: str, password: str) -> str:
-        async with AirThingsManager.get_session(session) as ses:
-            async with ses.post(
-                    url=AirThingsManager.format_string(
-                        AirThingsConstant.CT_ACCOUNTS_API_BASE,
-                        'token'),
-                    headers={
-                        'origin': AirThingsConstant.CT_ACCOUNTS_ORIGIN,
-                        'accept': AirThingsConstant.CT_JSON,
-                        'content-type': AirThingsConstant.CT_JSON,
-                        'user-agent': AirThingsConstant.CT_USER_AGENT,
-                    },
-                    json={
-                        'username': username,
-                        'password': password,
-                        'grant_type': 'password',
-                        'client_id': 'accounts'
-                    }) as response:
+        async with session.post(
+                url=AirThingsManager.format_string(
+                    AirThingsConstant.CT_ACCOUNTS_API_BASE,
+                    'token'),
+                headers={
+                    'origin': AirThingsConstant.CT_ACCOUNTS_ORIGIN,
+                    'accept': AirThingsConstant.CT_JSON,
+                    'content-type': AirThingsConstant.CT_JSON,
+                    'user-agent': AirThingsConstant.CT_USER_AGENT,
+                },
+                json={
+                    'username': username,
+                    'password': password,
+                    'grant_type': 'password',
+                    'client_id': 'accounts'
+                }) as response:
 
-                if math.floor(response.status / 100) == 2:
-                    rjson = await response.json()
-                    return rjson['access_token']
+            if math.floor(response.status / 100) == 2:
+                rjson = await response.json()
+                return rjson['access_token']
 
-                elif math.floor(response.status / 100) == 4:
-                    raise AirThingsUnauthorizedException(
-                        error_code=response.status,
-                        error_details=await response.text())
+            elif math.floor(response.status / 100) == 4:
+                raise AirThingsUnauthorizedException(
+                    error_code=response.status,
+                    error_details=await response.text())
 
-                else:
-                    raise AirThingsException(
-                        error_code=response.status,
-                        error_details=await response.text())
+            else:
+                raise AirThingsException(
+                    error_code=response.status,
+                    error_details=await response.text())
 
     @staticmethod
     async def __get_consent(session: aiohttp.ClientSession, token: str) -> Optional[Dict[str, Any]]:
-        async with AirThingsManager.get_session(session) as ses:
-            async with ses.get(
-                    url=AirThingsManager.format_string(
-                        AirThingsConstant.CT_ACCOUNTS_API_BASE,
-                        'consents/dashboard?client_id=dashboard&redirect_uri={0}'.format(
-                            AirThingsConstant.CT_DASHBOARD_ORIGIN)),
-                    headers={
-                        'origin': AirThingsConstant.CT_ACCOUNTS_ORIGIN,
-                        'accept': AirThingsConstant.CT_JSON,
-                        'content-type': AirThingsConstant.CT_JSON,
-                        'user-agent': AirThingsConstant.CT_USER_AGENT,
-                        'authorization': AirThingsManager.format_string(
-                            AirThingsConstant.CT_BEARER_FORMAT,
-                            token),
-                    }) as response:
+        async with session.get(
+                url=AirThingsManager.format_string(
+                    AirThingsConstant.CT_ACCOUNTS_API_BASE,
+                    'consents/dashboard?client_id=dashboard&redirect_uri={0}'.format(
+                        AirThingsConstant.CT_DASHBOARD_ORIGIN)),
+                headers={
+                    'origin': AirThingsConstant.CT_ACCOUNTS_ORIGIN,
+                    'accept': AirThingsConstant.CT_JSON,
+                    'content-type': AirThingsConstant.CT_JSON,
+                    'user-agent': AirThingsConstant.CT_USER_AGENT,
+                    'authorization': AirThingsManager.format_string(
+                        AirThingsConstant.CT_BEARER_FORMAT,
+                        token),
+                }) as response:
 
-                if math.floor(response.status / 100) == 2:
-                    return await response.json()
+            if math.floor(response.status / 100) == 2:
+                return await response.json()
 
-                elif math.floor(response.status / 100) == 4:
-                    raise AirThingsUnauthorizedException(
-                        error_code=response.status,
-                        error_details=await response.text())
+            elif math.floor(response.status / 100) == 4:
+                raise AirThingsUnauthorizedException(
+                    error_code=response.status,
+                    error_details=await response.text())
 
-                else:
-                    raise AirThingsException(
-                        error_code=response.status,
-                        error_details=await response.text())
+            else:
+                raise AirThingsException(
+                    error_code=response.status,
+                    error_details=await response.text())
 
     @staticmethod
     async def __get_authorization_code(session: aiohttp.ClientSession, token: str, consent) -> str:
-        async with AirThingsManager.get_session(session) as ses:
-            async with ses.post(
-                    url=AirThingsManager.format_string(
-                        AirThingsConstant.CT_ACCOUNTS_API_BASE,
-                        'authorize?client_id=dashboard&redirect_uri={0}'.format(
-                            AirThingsConstant.CT_DASHBOARD_ORIGIN)),
-                    headers={
-                        'origin': AirThingsConstant.CT_ACCOUNTS_ORIGIN,
-                        'accept': AirThingsConstant.CT_JSON,
-                        'content-type': AirThingsConstant.CT_JSON,
-                        'user-agent': AirThingsConstant.CT_USER_AGENT,
-                        'authorization': AirThingsManager.format_string(
-                            AirThingsConstant.CT_BEARER_FORMAT,
-                            token),
-                    },
-                    json=consent) as response:
+        async with session.post(
+                url=AirThingsManager.format_string(
+                    AirThingsConstant.CT_ACCOUNTS_API_BASE,
+                    'authorize?client_id=dashboard&redirect_uri={0}'.format(
+                        AirThingsConstant.CT_DASHBOARD_ORIGIN)),
+                headers={
+                    'origin': AirThingsConstant.CT_ACCOUNTS_ORIGIN,
+                    'accept': AirThingsConstant.CT_JSON,
+                    'content-type': AirThingsConstant.CT_JSON,
+                    'user-agent': AirThingsConstant.CT_USER_AGENT,
+                    'authorization': AirThingsManager.format_string(
+                        AirThingsConstant.CT_BEARER_FORMAT,
+                        token),
+                },
+                json=consent) as response:
 
-                if math.floor(response.status / 100) == 2:
+            if math.floor(response.status / 100) == 2:
 
-                    rjson = await response.json()
-                    redirect_uri = rjson['redirect_uri']
-                    
-                    fragments = up.urlparse(redirect_uri)
-                    code = up.parse_qs(fragments.query)['code'][0]
-
-                    return code
+                rjson = await response.json()
+                redirect_uri = rjson['redirect_uri']
                 
-                elif math.floor(response.status / 100) == 4:
-                    raise AirThingsUnauthorizedException(
-                        error_code=response.status,
-                        error_details=await response.text())
-                else:
-                    raise AirThingsException(
-                        error_code=response.status,
-                        error_details=await response.text())
+                fragments = up.urlparse(redirect_uri)
+                code = up.parse_qs(fragments.query)['code'][0]
+
+                return code
+            
+            elif math.floor(response.status / 100) == 4:
+                raise AirThingsUnauthorizedException(
+                    error_code=response.status,
+                    error_details=await response.text())
+            else:
+                raise AirThingsException(
+                    error_code=response.status,
+                    error_details=await response.text())
 
     @staticmethod
     async def __get_access_and_refresh_token(session: aiohttp.ClientSession, authorization_code: str) -> Optional[Dict[str, Any]]:
-        async with AirThingsManager.get_session(session) as ses:
-            async with ses.post(
-                    url=AirThingsManager.format_string(
-                        AirThingsConstant.CT_ACCOUNTS_API_BASE,
-                        'token'),
-                    headers={
-                        'origin': AirThingsConstant.CT_DASHBOARD_ORIGIN,
-                        'accept': AirThingsConstant.CT_JSON,
-                        'content-type': AirThingsConstant.CT_JSON,
-                        'user-agent': AirThingsConstant.CT_USER_AGENT,
-                        'sec-fetch-dest': 'empty',
-                        'sec-fetch-mode': 'cors',
-                        'sec-fetch-site': 'cross-site',
-                    },
-                    json={
-                        'client_id': 'dashboard',
-                        'client_secret': AirThingsConstant.CT_DASHBOARD_SECRET,
-                        'code': authorization_code,
-                        'grant_type': 'authorization_code',
-                        'redirect_uri': AirThingsConstant.CT_DASHBOARD_ORIGIN,
-                    }) as response:
+        async with session.post(
+                url=AirThingsManager.format_string(
+                    AirThingsConstant.CT_ACCOUNTS_API_BASE,
+                    'token'),
+                headers={
+                    'origin': AirThingsConstant.CT_DASHBOARD_ORIGIN,
+                    'accept': AirThingsConstant.CT_JSON,
+                    'content-type': AirThingsConstant.CT_JSON,
+                    'user-agent': AirThingsConstant.CT_USER_AGENT,
+                    'sec-fetch-dest': 'empty',
+                    'sec-fetch-mode': 'cors',
+                    'sec-fetch-site': 'cross-site',
+                },
+                json={
+                    'client_id': 'dashboard',
+                    'client_secret': AirThingsConstant.CT_DASHBOARD_SECRET,
+                    'code': authorization_code,
+                    'grant_type': 'authorization_code',
+                    'redirect_uri': AirThingsConstant.CT_DASHBOARD_ORIGIN,
+                }) as response:
 
-                if math.floor(response.status / 100) == 2:
-                    
-                    response_dict = await response.json()
+            if math.floor(response.status / 100) == 2:
+                
+                response_dict = await response.json()
 
-                    return {
-                        'access_token': response_dict['access_token'], 
-                        'refresh_token': response_dict['refresh_token'], 
-                        'expires_in': response_dict['expires_in'],
-                        'timestamp': dt.datetime.utcnow(),
-                    }
+                return {
+                    'access_token': response_dict['access_token'], 
+                    'refresh_token': response_dict['refresh_token'], 
+                    'expires_in': response_dict['expires_in'],
+                    'timestamp': dt.datetime.utcnow(),
+                }
 
-                elif math.floor(response.status / 100) == 4:
-                    raise AirThingsUnauthorizedException(
-                        error_code=response.status,
-                        error_details=await response.text())
-                else:
-                    raise AirThingsException(
-                        error_code=response.status,
-                        error_details=await response.text())
+            elif math.floor(response.status / 100) == 4:
+                raise AirThingsUnauthorizedException(
+                    error_code=response.status,
+                    error_details=await response.text())
+            else:
+                raise AirThingsException(
+                    error_code=response.status,
+                    error_details=await response.text())
 
     @staticmethod
     async def __refresh_access_and_refresh_token(session: aiohttp.ClientSession, previous_refresh_token: str) -> Optional[Dict[str, Any]]:
-        async with AirThingsManager.get_session(session) as ses:
-            async with ses.post(
-                    url=AirThingsManager.format_string(
-                        AirThingsConstant.CT_ACCOUNTS_API_BASE,
-                        'token'),
-                    headers={
-                        'origin': AirThingsConstant.CT_DASHBOARD_ORIGIN,
-                        'accept': AirThingsConstant.CT_JSON,
-                        'content-type': AirThingsConstant.CT_JSON,
-                        'user-agent': AirThingsConstant.CT_USER_AGENT,
-                        'sec-fetch-dest': 'empty',
-                        'sec-fetch-mode': 'cors',
-                        'sec-fetch-site': 'cross-site',
-                    },
-                    json={
-                        'client_id': 'dashboard',
-                        'client_secret': AirThingsConstant.CT_DASHBOARD_SECRET,
-                        'refresh_token': previous_refresh_token,
-                        'grant_type': 'refresh_token',
-                    }) as response:
+        async with session.post(
+                url=AirThingsManager.format_string(
+                    AirThingsConstant.CT_ACCOUNTS_API_BASE,
+                    'token'),
+                headers={
+                    'origin': AirThingsConstant.CT_DASHBOARD_ORIGIN,
+                    'accept': AirThingsConstant.CT_JSON,
+                    'content-type': AirThingsConstant.CT_JSON,
+                    'user-agent': AirThingsConstant.CT_USER_AGENT,
+                    'sec-fetch-dest': 'empty',
+                    'sec-fetch-mode': 'cors',
+                    'sec-fetch-site': 'cross-site',
+                },
+                json={
+                    'client_id': 'dashboard',
+                    'client_secret': AirThingsConstant.CT_DASHBOARD_SECRET,
+                    'refresh_token': previous_refresh_token,
+                    'grant_type': 'refresh_token',
+                }) as response:
 
-                if math.floor(response.status / 100) == 2:
-                    
-                    response_dict = await response.json()
+            if math.floor(response.status / 100) == 2:
+                
+                response_dict = await response.json()
 
-                    return {
-                        'access_token': response_dict['access_token'], 
-                        'refresh_token': response_dict['refresh_token'], 
-                        'expires_in': response_dict['expires_in'],
-                        'timestamp': dt.datetime.utcnow(),
-                    }
+                return {
+                    'access_token': response_dict['access_token'], 
+                    'refresh_token': response_dict['refresh_token'], 
+                    'expires_in': response_dict['expires_in'],
+                    'timestamp': dt.datetime.utcnow(),
+                }
 
-                elif math.floor(response.status / 100) == 4:
-                    raise AirThingsUnauthorizedException(
-                        error_code=response.status,
-                        error_details=await response.text())
-                else:
-                    raise AirThingsException(
-                        error_code=response.status,
-                        error_details=await response.text())
-
-    def get_session(self):
-        if self.session is None:
-            self.session = aiohttp.ClientSession()
-        return self.session
+            elif math.floor(response.status / 100) == 4:
+                raise AirThingsUnauthorizedException(
+                    error_code=response.status,
+                    error_details=await response.text())
+            else:
+                raise AirThingsException(
+                    error_code=response.status,
+                    error_details=await response.text())
 
     @staticmethod
     def log(**kwargs):
@@ -437,34 +427,33 @@ class AirThingsManager:
 
     @staticmethod
     async def __poll_generic_entity(session: aiohttp.ClientSession, access_token: str, entity: str) -> Optional[Dict[str, Any]]:
-        async with AirThingsManager.get_session(session) as ses:
-            async with ses.get(
-                    url=AirThingsManager.format_string(
-                        AirThingsConstant.CT_WEB_API_BASE,
-                        entity),
-                    headers={
-                        'origin': AirThingsConstant.CT_DASHBOARD_ORIGIN,
-                        'accept': AirThingsConstant.CT_JSON,
-                        'content-type': AirThingsConstant.CT_JSON,
-                        'user-agent': AirThingsConstant.CT_USER_AGENT,
-                        'authorization': access_token,
-                        'sec-fetch-dest': 'empty',
-                        'sec-fetch-mode': 'cors',
-                        'sec-fetch-site': 'cross-site',
-                    }) as response:
+        async with session.get(
+                url=AirThingsManager.format_string(
+                    AirThingsConstant.CT_WEB_API_BASE,
+                    entity),
+                headers={
+                    'origin': AirThingsConstant.CT_DASHBOARD_ORIGIN,
+                    'accept': AirThingsConstant.CT_JSON,
+                    'content-type': AirThingsConstant.CT_JSON,
+                    'user-agent': AirThingsConstant.CT_USER_AGENT,
+                    'authorization': access_token,
+                    'sec-fetch-dest': 'empty',
+                    'sec-fetch-mode': 'cors',
+                    'sec-fetch-site': 'cross-site',
+                }) as response:
 
-                if math.floor(response.status / 100) == 2:
-                    return await response.json()
+            if math.floor(response.status / 100) == 2:
+                return await response.json()
 
-                elif math.floor(response.status / 100) == 4:
-                    raise AirThingsUnauthorizedException(
-                        error_code=response.status,
-                        error_details=await response.text())
+            elif math.floor(response.status / 100) == 4:
+                raise AirThingsUnauthorizedException(
+                    error_code=response.status,
+                    error_details=await response.text())
 
-                else:
-                    raise AirThingsException(
-                        error_code=response.status,
-                        error_details=await response.text())
+            else:
+                raise AirThingsException(
+                    error_code=response.status,
+                    error_details=await response.text())
 
 
     @staticmethod
@@ -476,7 +465,7 @@ class AirThingsManager:
 
     async def __poll_relay_devices(self) -> Optional[Dict[str, Any]]:
         return await AirThingsManager.__poll_relay_devices_base(
-            session=self.get_session(),
+            session=self.session,
             access_token=self.tokens['access_token'])
 
 
@@ -489,7 +478,7 @@ class AirThingsManager:
 
     async def __poll_locations(self) -> Optional[Dict[str, Any]]:
         return await AirThingsManager.__poll_locations_base(
-            session=self.get_session(),
+            session=self.session,
             access_token=self.tokens['access_token'])
 
 
@@ -502,7 +491,7 @@ class AirThingsManager:
 
     async def __poll_thresholds(self) -> Optional[Dict[str, Any]]:
         return await AirThingsManager.__poll_thresholds_base(
-            session=self.get_session(),
+            session=self.session,
             access_token=self.tokens['access_token'])
 
 
@@ -515,5 +504,5 @@ class AirThingsManager:
 
     async def __poll_me(self) -> Optional[Dict[str, Any]]:
         return await AirThingsManager.__poll_me_base(
-            session=self.get_session(),
+            session=self.session,
             access_token=self.tokens['access_token'])
