@@ -88,10 +88,10 @@ class AirThingsManager:
     async def validate_credentials(self) -> bool:
         advise = await self.__assert_ready()
         return (advise == AirThingsAuthenticationAdvise.ShouldBeGood)
-        
+
     async def __execute_poll(self, poll_coroutine: Coroutine) -> Optional[Dict[str, Any]]:
         advise = await self.__assert_ready()
-        
+
         if advise == AirThingsAuthenticationAdvise.ShouldBeGood:
             try:
                 return await poll_coroutine
@@ -99,8 +99,8 @@ class AirThingsManager:
             except AirThingsUnauthorizedException as atue:
                 _LOGGER.error(
                     AirThingsManager.log(
-                        method=poll_coroutine.__name__, 
-                        error_code=atue.error_code, 
+                        method=poll_coroutine.__name__,
+                        error_code=atue.error_code,
                         error_details=atue.error_details))
 
                 return None
@@ -108,8 +108,8 @@ class AirThingsManager:
             except AirThingsException as ate:
                 _LOGGER.error(
                     AirThingsManager.log(
-                        method=poll_coroutine.__name__, 
-                        error_code=ate.error_code, 
+                        method=poll_coroutine.__name__,
+                        error_code=ate.error_code,
                         error_details=ate.error_details))
 
                 return None
@@ -117,8 +117,8 @@ class AirThingsManager:
         elif advise == AirThingsAuthenticationAdvise.ShouldCheckCredentials:
             _LOGGER.warning(
                 AirThingsManager.log(
-                    method=poll_coroutine.__name__, 
-                    advise=advise, 
+                    method=poll_coroutine.__name__,
+                    advise=advise,
                     message='invalid credentials'))
 
             raise AirThingsInvalidCredentialsException()
@@ -126,8 +126,8 @@ class AirThingsManager:
         else:
             _LOGGER.warning(
                 AirThingsManager.log(
-                    method=poll_coroutine.__name__, 
-                    advise=advise, 
+                    method=poll_coroutine.__name__,
+                    advise=advise,
                     message='cannot execute poll'))
 
             return None
@@ -183,8 +183,8 @@ class AirThingsManager:
         except AirThingsUnauthorizedException as atue:
             _LOGGER.error(
                 AirThingsManager.log(
-                    method='__perform_login', 
-                    error_code=atue.error_code, 
+                    method='__perform_login',
+                    error_code=atue.error_code,
                     error_details=atue.error_details))
 
             self.tokens = None
@@ -193,8 +193,8 @@ class AirThingsManager:
         except AirThingsException as ate:
             _LOGGER.error(
                 AirThingsManager.log(
-                    method='__perform_login', 
-                    error_code=ate.error_code, 
+                    method='__perform_login',
+                    error_code=ate.error_code,
                     error_details=ate.error_details))
 
             self.tokens = None
@@ -211,23 +211,22 @@ class AirThingsManager:
         except AirThingsUnauthorizedException as atue:
             _LOGGER.error(
                 AirThingsManager.log(
-                    method='__perform_refresh', 
-                    error_code=atue.error_code, 
+                    method='__perform_refresh',
+                    error_code=atue.error_code,
                     error_details=atue.error_details))
 
             self.tokens = None
             return AirThingsAuthenticationAdvise.ShouldLogin
-            
+
         except AirThingsException as ate:
             _LOGGER.error(
                 AirThingsManager.log(
-                    method='__perform_refresh', 
-                    error_code=ate.error_code, 
+                    method='__perform_refresh',
+                    error_code=ate.error_code,
                     error_details=ate.error_details))
 
             self.tokens = None
             return AirThingsAuthenticationAdvise.ShouldWait
-
 
     @staticmethod
     async def __get_token(session: aiohttp.ClientSession, username: str, password: str) -> str:
@@ -314,12 +313,12 @@ class AirThingsManager:
 
                 rjson = await response.json()
                 redirect_uri = rjson['redirect_uri']
-                
+
                 fragments = up.urlparse(redirect_uri)
                 code = up.parse_qs(fragments.query)['code'][0]
 
                 return code
-            
+
             elif math.floor(response.status / 100) == 4:
                 raise AirThingsUnauthorizedException(
                     error_code=response.status,
@@ -353,12 +352,12 @@ class AirThingsManager:
                 }) as response:
 
             if math.floor(response.status / 100) == 2:
-                
+
                 response_dict = await response.json()
 
                 return {
-                    'access_token': response_dict['access_token'], 
-                    'refresh_token': response_dict['refresh_token'], 
+                    'access_token': response_dict['access_token'],
+                    'refresh_token': response_dict['refresh_token'],
                     'expires_in': response_dict['expires_in'],
                     'timestamp': dt.datetime.utcnow(),
                 }
@@ -395,12 +394,12 @@ class AirThingsManager:
                 }) as response:
 
             if math.floor(response.status / 100) == 2:
-                
+
                 response_dict = await response.json()
 
                 return {
-                    'access_token': response_dict['access_token'], 
-                    'refresh_token': response_dict['refresh_token'], 
+                    'access_token': response_dict['access_token'],
+                    'refresh_token': response_dict['refresh_token'],
                     'expires_in': response_dict['expires_in'],
                     'timestamp': dt.datetime.utcnow(),
                 }
@@ -419,7 +418,7 @@ class AirThingsManager:
         logger = ''
         for key, value in kwargs.items():
             logger = logger + '{0}: "{1}" | '.format(key, value)
-        return logger        
+        return logger
 
     @staticmethod
     def format_string(template: AirThingsConstant, *args) -> str:
@@ -455,7 +454,6 @@ class AirThingsManager:
                     error_code=response.status,
                     error_details=await response.text())
 
-
     @staticmethod
     async def __poll_relay_devices_base(session: aiohttp.ClientSession, access_token: str) -> Optional[Dict[str, Any]]:
         return await AirThingsManager.__poll_generic_entity(
@@ -467,7 +465,6 @@ class AirThingsManager:
         return await AirThingsManager.__poll_relay_devices_base(
             session=self.session,
             access_token=self.tokens['access_token'])
-
 
     @staticmethod
     async def __poll_locations_base(session: aiohttp.ClientSession, access_token: str) -> Optional[Dict[str, Any]]:
@@ -481,7 +478,6 @@ class AirThingsManager:
             session=self.session,
             access_token=self.tokens['access_token'])
 
-
     @staticmethod
     async def __poll_thresholds_base(session: aiohttp.ClientSession, access_token: str) -> Optional[Dict[str, Any]]:
         return await AirThingsManager.__poll_generic_entity(
@@ -493,7 +489,6 @@ class AirThingsManager:
         return await AirThingsManager.__poll_thresholds_base(
             session=self.session,
             access_token=self.tokens['access_token'])
-
 
     @staticmethod
     async def __poll_me_base(session: aiohttp.ClientSession, access_token: str) -> Optional[Dict[str, Any]]:
