@@ -76,31 +76,31 @@ def to_class(c: Type[T], x: Any) -> dict:
 @dataclass
 class CurrentSensorValue:
     type_: str
-    value: float
+    value: Optional[float]
     provided_unit: str
     preferred_unit: str
     is_alert: bool
-    thresholds: List[int]
+    thresholds: List[float]
 
     @staticmethod
     def from_dict(obj: Any) -> 'CurrentSensorValue':
         assert isinstance(obj, dict)
         type_ = from_str(obj.get("type"))
-        value = from_float(obj.get("value"))
+        value = from_union([from_float, from_none], obj.get("value"))
         provided_unit = from_str(obj.get("providedUnit"))
         preferred_unit = from_str(obj.get("preferredUnit"))
         is_alert = from_bool(obj.get("isAlert"))
-        thresholds = from_list(from_int, obj.get("thresholds"))
+        thresholds = from_list(from_float, obj.get("thresholds"))
         return CurrentSensorValue(type_, value, provided_unit, preferred_unit, is_alert, thresholds)
 
     def to_dict(self) -> dict:
         result: dict = {}
         result["type"] = from_str(self.type_)
-        result["value"] = to_float(self.value)
+        result["value"] = from_union([from_float, from_none], self.value)
         result["providedUnit"] = from_str(self.provided_unit)
         result["preferredUnit"] = from_str(self.preferred_unit)
         result["isAlert"] = from_bool(self.is_alert)
-        result["thresholds"] = from_list(from_int, self.thresholds)
+        result["thresholds"] = from_list(from_float, self.thresholds)
         return result
 
 
