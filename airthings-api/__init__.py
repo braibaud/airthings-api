@@ -7,4 +7,4 @@ from .responses import me_instance
 from .responses import relay_devices_instance
 from .responses import thresholds_instance
 
-__version__ = '0.1.4'
+__version__ = '0.1.5'
